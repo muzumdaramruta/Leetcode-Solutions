@@ -5,17 +5,18 @@
 #         self.left = left
 #         self.right = right
 class Solution:
+    def dfs(self, root, arr):
+        if not root:
+            return
+        self.dfs(root.left, arr)
+        arr.append(root.val)
+        self.dfs(root.right, arr)
+        
     def getMinimumDifference(self, root: Optional[TreeNode]) -> int:
-        self.prev = None
-        self.ans = float('inf')
-
-        def dfs(node):
-            if node:
-                dfs(node.left)
-                if self.prev is not None:
-                    self.ans = min(self.ans, node.val - self.prev)
-                self.prev = node.val
-                dfs(node.right)
-
-        dfs(root)
-        return self.ans
+        arr = []
+        self.dfs(root, arr)
+        minn = arr[1] - arr[0]
+        n = len(arr)
+        for i in range(n - 1, 0, -1):
+            minn = min(minn, arr[i] - arr[i - 1])
+        return minn
