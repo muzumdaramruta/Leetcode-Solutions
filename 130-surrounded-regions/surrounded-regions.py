@@ -3,38 +3,16 @@ class Solution:
         """
         Do not return anything, modify board in-place instead.
         """
+        if not any(board): return
+
         m, n = len(board), len(board[0])
+        save = [ij for k in range(m+n) for ij in ((0, k), (m-1, k), (k, 0), (k, n-1))]
+        while save:
+            i, j = save.pop()
+            if 0 <= i < m and 0 <= j < n and board[i][j] == 'O':
+                board[i][j] = 'S'
+                save += (i, j-1), (i, j+1), (i-1, j), (i+1, j)
 
-        def dfs(pos: tuple, safe: set):
-            i, j = pos
-
-            if board[i][j] != "O":
-                return
-
-            for i_off, j_off in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                row, col = i+i_off, j+j_off
-                if 0 <= row < m and 0 <= col < n:
-                    if board[row][col] == "O" and (row, col) not in safe:
-                        safe.add((row, col))
-                        dfs((row, col), safe)
-
-        safe = set()
-        for i in range(m):
-            if board[i][0] == "O":
-                dfs((i, 0), safe)
-                safe.add((i, 0))
-            if board[i][n-1] == "O":
-                dfs((i, n-1), safe)
-                safe.add((i, n-1))
-        for j in range(n):
-            if board[0][j] == "O":
-                dfs((0, j), safe)
-                safe.add((0, j))
-            if board[m-1][j] == "O":
-                dfs((m - 1, j), safe)
-                safe.add((m - 1, j))
-
-        for i in range(1, m-1):
-            for j in range(1, n-1):
-                if (i, j) not in safe:
-                    board[i][j] = "X"
+        for row in board:
+            for i, c in enumerate(row):
+                row[i] = 'XO'[c == 'S']
