@@ -1,44 +1,40 @@
-from typing import List
-
 class Solution:
-    def solve(self, board: List[List[str]]) -> None:
-        if not board or not board[0]:
-            return
-
+    def solve(self, board: list[list[str]]) -> None:
+        """
+        Do not return anything, modify board in-place instead.
+        """
         m, n = len(board), len(board[0])
-        visited = [[False] * n for _ in range(m)]
 
-        def dfs(i, j):
-            if i < 0 or i >= m or j < 0 or j >= n or visited[i][j] or board[i][j] == 'X':
+        def dfs(pos: tuple, safe: set):
+            i, j = pos
+
+            if board[i][j] != "O":
                 return
-            
-            visited[i][j] = True
-            
-            "Explore neighbors " 
-            dfs(i + 1, j)
-            dfs(i - 1, j)
-            dfs(i, j + 1)
-            dfs(i, j - 1)
 
-        "1. **Traverse** borders and mark connected 'O's"
+            for i_off, j_off in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                row, col = i+i_off, j+j_off
+                if 0 <= row < m and 0 <= col < n:
+                    if board[row][col] == "O" and (row, col) not in safe:
+                        safe.add((row, col))
+                        dfs((row, col), safe)
+
+        safe = set()
+        for i in range(m):
+            if board[i][0] == "O":
+                dfs((i, 0), safe)
+                safe.add((i, 0))
+            if board[i][n-1] == "O":
+                dfs((i, n-1), safe)
+                safe.add((i, n-1))
         for j in range(n):
-            "Top row"
-            if board[0][j] == 'O' and not visited[0][j]:
-                dfs(0, j)
-            "Bottom row"
-            if board[m - 1][j] == 'O' and not visited[m - 1][j]:
-                dfs(m - 1, j)
-        
-        for i in range(m):
-            "Left column"
-            if board[i][0] == 'O' and not visited[i][0]:
-                dfs(i, 0)
-            "Right column"
-            if board[i][n - 1] == 'O' and not visited[i][n - 1]:
-                dfs(i, n - 1)
+            if board[0][j] == "O":
+                dfs((0, j), safe)
+                safe.add((0, j))
+            if board[m-1][j] == "O":
+                dfs((m - 1, j), safe)
+                safe.add((m - 1, j))
 
-        "2. **Flip** unvisited 'O's"
-        for i in range(m):
-            for j in range(n):
-                if board[i][j] == 'O' and not visited[i][j]:
-                    board[i][j] = 'X'
+        for i in range(1, m-1):
+            for j in range(1, n-1):
+                if (i, j) not in safe:
+                    board[i][j] = "X"
