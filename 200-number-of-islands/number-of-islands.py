@@ -1,23 +1,21 @@
 class Solution:
     def numIslands(self, grid: List[List[str]]) -> int:
-        m, n = len(grid), len(grid[0])
-        def dfs(pos):
-            x, y = pos
-            current = grid[x][y]
-            if current == "#" or current == "0":
-                return False
-            grid[x][y] = "#"
+        if not grid:
+            return 0
+            
+        count = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == '1':
+                    self.dfs(grid, i, j)
+                    count += 1
+        return count
 
-            for x_offset, y_offset in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
-                new_x, new_y = x+x_offset, y+y_offset
-                if 0 <= new_x < m and 0 <= new_y < n:
-                    dfs((new_x, new_y))
-            return True
-
-        res = 0
-        for i in range(m):
-            for j in range(n):
-                if grid[i][j] == "1":
-                    if dfs((i, j)):
-                        res += 1
-        return res
+    def dfs(self, grid, i, j):
+        if i<0 or j<0 or i>=len(grid) or j>=len(grid[0]) or grid[i][j] != '1':
+            return
+        grid[i][j] = '#'
+        self.dfs(grid, i+1, j)
+        self.dfs(grid, i-1, j)
+        self.dfs(grid, i, j+1)
+        self.dfs(grid, i, j-1)
