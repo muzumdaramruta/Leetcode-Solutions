@@ -8,20 +8,15 @@ class Node:
 
 from typing import Optional
 class Solution:
+    def dfs(self, node: 'Node', seen: dict[int, 'Node']) -> 'Node':
+        root: 'Node' = Node(node.val)
+        seen[node.val] = root
+        for neighbor in node.neighbors:
+            if neighbor.val not in seen: root.neighbors.append(self.dfs(neighbor, seen))
+            else: root.neighbors.append(seen[neighbor.val])
+        return root
+
     def cloneGraph(self, node: Optional['Node']) -> Optional['Node']:
-        if not node:
-            return
-        copied = {}
-
-        def dfs(curr):
-            if curr in copied:
-                return copied[curr]
-            clone = Node(curr.val, [])
-            copied[curr] = clone
-
-            for neighbor in curr.neighbors:
-                clone_neighbors = dfs(neighbor)
-                clone.neighbors.append(clone_neighbors)
-            return clone
-        
-        return dfs(node)
+        if not node: return None
+        seen: dict[int, 'Node'] = dict()
+        return self.dfs(node, seen)
