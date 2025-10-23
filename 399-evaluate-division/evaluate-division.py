@@ -1,38 +1,30 @@
 class Solution:
     def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -> List[float]:
-        graph = {}
+        # Step 1: Build the graph
+        graph = defaultdict(dict)
         
-        def build_graph(equations, values):
-            def add_edge(f, t, value):
-                if f in graph:
-                    graph[f].append((t, value))
-                else:
-                    graph[f] = [(t, value)]
-            
-            for vertices, value in zip(equations, values):
-                f, t = vertices
-                add_edge(f, t, value)
-                add_edge(t, f, 1/value)
+        for (u, v), val in zip(equations, values):
+            graph[u][v] = val
+            graph[v][u] = 1.0 / val
         
-        def find_path(query):
-            b, e = query
-            
-            if b not in graph or e not in graph:
+        # Step 2: DFS function
+        def dfs(curr, target, visited):
+            if curr not in graph or target not in graph:
                 return -1.0
-                
-            q = collections.deque([(b, 1.0)])
-            visited = set()
+            if curr == target:
+                return 1.0
             
-            while q:
-                front, cur_product = q.popleft()
-                if front == e:
-                    return cur_product
-                visited.add(front)
-                for neighbor, value in graph[front]:
-                    if neighbor not in visited:
-                        q.append((neighbor, cur_product*value))
-            
+            visited.add(curr)
+            for neighbor, weight in graph[curr].items():
+                if neighbor not in visited:
+                    result = dfs(neighbor, target, visited)
+                    if result != -1.0:
+                        return weight * result
             return -1.0
         
-        build_graph(equations, values)
-        return [find_path(q) for q in queries]
+        # Step 3: Process queries
+        results = []
+        for start, end in queries:
+            results.append(dfs(start, end, set()))
+        
+        return results
