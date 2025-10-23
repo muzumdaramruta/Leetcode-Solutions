@@ -1,25 +1,27 @@
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
-
-        adj = {i: [] for i in range(numCourses)}
-        in_degrees = [0] * numCourses
-
-        # set up In Degrees for topological sort
+        preMap = defaultdict(list)
         for course, prereq in prerequisites:
-            adj[prereq].append(course)
-            in_degrees[course] += 1
+            preMap[course].append(prereq)
 
-        # if we actually wanted to sort we'd append to an output array
-        # for cycle detection we don't need that
-        out = 0
-        q = deque([x for x in range(numCourses) if in_degrees[x] == 0])
+        visiting = set()
+        visited = set()
 
-        while q:
-            u = q.popleft()
-            for v in adj[u]:
-                in_degrees[v] -= 1
-                if in_degrees[v] == 0:
-                    q.append(v)
-            out += 1
-        
-        return out == numCourses
+        def dfs(course):
+            if course in visiting:
+                return False  # cycle detected
+            if course in visited:
+                return True   # already checked
+
+            visiting.add(course)
+            for prereq in preMap[course]:
+                if not dfs(prereq):
+                    return False
+            visiting.remove(course)
+            visited.add(course)
+            return True
+
+        for course in range(numCourses):
+            if not dfs(course):
+                return False
+        return True
