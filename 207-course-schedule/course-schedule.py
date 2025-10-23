@@ -1,27 +1,25 @@
 class Solution:
-    def canFinish(self, n: int, prerequisites: List[List[int]]) -> bool:
-        adj = [[] for _ in range(n)]
-        indegree = [0] * n
-        ans = []
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
 
-        for pair in prerequisites:
-            course = pair[0]
-            prerequisite = pair[1]
-            adj[prerequisite].append(course)
-            indegree[course] += 1
+        adj = {i: [] for i in range(numCourses)}
+        in_degrees = [0] * numCourses
 
-        queue = deque()
-        for i in range(n):
-            if indegree[i] == 0:
-                queue.append(i)
+        # set up In Degrees for topological sort
+        for course, prereq in prerequisites:
+            adj[prereq].append(course)
+            in_degrees[course] += 1
 
-        while queue:
-            current = queue.popleft()
-            ans.append(current)
+        # if we actually wanted to sort we'd append to an output array
+        # for cycle detection we don't need that
+        out = 0
+        q = deque([x for x in range(numCourses) if in_degrees[x] == 0])
 
-            for next_course in adj[current]:
-                indegree[next_course] -= 1
-                if indegree[next_course] == 0:
-                    queue.append(next_course)
-
-        return len(ans) == n
+        while q:
+            u = q.popleft()
+            for v in adj[u]:
+                in_degrees[v] -= 1
+                if in_degrees[v] == 0:
+                    q.append(v)
+            out += 1
+        
+        return out == numCourses
