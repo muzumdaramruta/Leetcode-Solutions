@@ -1,7 +1,7 @@
 class Solution:
     def snakesAndLadders(self, board: List[List[int]]) -> int:
         n=len(board)
-        flatten = [0]*(n*n)
+        flatten=[0]*(n*n)
         for i in range(n-1, -1, -2):
             for j in range(n):
                 flatten[(n-1-i)*n+j]=board[i][j]-1
