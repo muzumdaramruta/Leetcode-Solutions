@@ -1,24 +1,35 @@
+from collections import deque
+
 class Solution:
-    def snakesAndLadders(self, board: List[List[int]]) -> int:
+    def snakesAndLadders(self, board):
         n = len(board)
-        min_rolls = [-1] * (n * n + 1)
-        q = deque()
-        min_rolls[1] = 0
-        q.append(1)
+        
+        def get_pos(num):
+            r, c = divmod(num - 1, n)
+            if r % 2 == 0:
+                return (n - 1 - r, c)
+            return (n - 1 - r, n - 1 - c)
+
+        visited = [False] * (n * n + 1)
+        q = deque([1])
+        visited[1] = True
+        moves = 0
 
         while q:
-            x = q.popleft()
-            for i in range(1, 7):
-                t = x + i
-                if t > n * n:
-                    break
-                row = (t - 1) // n
-                col = (t - 1) % n
-                v = board[n - 1 - row][(n - 1 - col) if (row % 2 == 1) else col]
-                y = v if v > 0 else t
-                if y == n * n:
-                    return min_rolls[x] + 1
-                if min_rolls[y] == -1:
-                    min_rolls[y] = min_rolls[x] + 1
-                    q.append(y)
+            for _ in range(len(q)):
+                curr = q.popleft()
+                if curr == n * n:
+                    return moves
+                for i in range(1, 7):
+                    nxt = curr + i
+                    if nxt > n * n:
+                        continue
+                    r, c = get_pos(nxt)
+                    if board[r][c] != -1:
+                        nxt = board[r][c]
+                    if not visited[nxt]:
+                        visited[nxt] = True
+                        q.append(nxt)
+            moves += 1
+
         return -1
