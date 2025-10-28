@@ -23,5 +23,5 @@ class Trie(object):
 		t = self.trie
 		for c in prefix:
 			if c not in t: return False
-			t = t[c]
+			t = t[c] 
 		return True
