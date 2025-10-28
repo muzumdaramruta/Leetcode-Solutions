@@ -1,18 +1,29 @@
 class WordDictionary:
 
     def __init__(self):
-        self.root = {}
-    
-    def addWord(self, word):
-        node = self.root
-        for char in word:
-            node = node.setdefault(char, {})
-        node['$'] = None
+        self.trie = dict()
 
-    def search(self, word):
-        nodes = [self.root]
-        for char in word + '$':
-            nodes = [kid for node in nodes for kid in
-                     ([node[char]] if char in node else
-                      filter(None, node.values()) if char == '.' else [])]
-        return bool(nodes)
+    def addWord(self, word: str) -> None:
+        node = self.trie
+        for ch in word + '\U0001f33b':
+            if ch not in node:
+                node[ch] = dict()
+
+            node = node[ch]
+
+    def search(self, word: str) -> bool:
+        nodes = [self.trie]
+        for ch in word + '\U0001f33b':
+            newNodes = []
+            for node in nodes:
+                if ch == '.': 
+                    newNodes += [v for v in node.values()]
+                elif ch in node: 
+                    newNodes.append(node[ch])
+
+            if not newNodes:
+                return False
+
+            nodes = newNodes
+            
+        return True
