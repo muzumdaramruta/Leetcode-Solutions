@@ -1,34 +1,29 @@
-Trie = dict[str, "Trie"]
-
 class WordDictionary:
-  def __init__(self):
-    self._storage: Trie = {}
-    self._end = "#"
-    self._any = "."
 
-  def addWord(self, word: str) -> None:
-    curr = self._storage
-    for char in word:
-      if char not in curr:
-        curr[char] = {}
-      curr = curr[char]
-    curr[self._end] = {}
+    def __init__(self):
+        self.trie = dict()
 
-  def search(self, word: str) -> bool:
-    return self._recursive_search(self._storage, 0, word)
+    def addWord(self, word: str) -> None:
+        node = self.trie
+        for ch in word + '\U0001f33b':
+            if ch not in node:
+                node[ch] = dict()
 
-  def _recursive_search(self, node: Trie, idx: int, word: str) -> bool:
-    if idx == len(word):
-      return self._end in node
+            node = node[ch]
 
-    char = word[idx]
-    if char is self._any:
-      res = False
-      for entry in node:
-        res |= self._recursive_search(node[entry], idx + 1, word)
-      return res
+    def search(self, word: str) -> bool:
+        nodes = [self.trie]
+        for ch in word + '\U0001f33b':
+            newNodes = []
+            for node in nodes:
+                if ch == '.': 
+                    newNodes += [v for v in node.values()]
+                elif ch in node: 
+                    newNodes.append(node[ch])
 
-    if char not in node:
-      return False
+            if not newNodes:
+                return False
 
-    return self._recursive_search(node[char], idx + 1, word)
+            nodes = newNodes
+            
+        return True
