@@ -1,26 +1,27 @@
-class Trie:
-    def __init__(self):
-        self.children = defaultdict(Trie)
-        self.isWord = False
+class Trie(object):
 
-    def insert(self, word: str) -> None:
-        cur = self
-        for c in word:
-            cur = cur.children[c]
-        cur.isWord = True
+	def __init__(self):
+		self.trie = {}
 
-    def search(self, word: str) -> bool:
-        cur = self
-        for c in word:
-            if c not in cur.children:
-                return False
-            cur = cur.children[c]
-        return cur.isWord
 
-    def startsWith(self, prefix: str) -> bool:
-        cur = self
-        for c in prefix:
-            if c not in cur.children:
-                return False
-            cur = cur.children[c]
-        return True
+	def insert(self, word):
+		t = self.trie
+		for c in word:
+			if c not in t: t[c] = {}
+			t = t[c]
+		t["-"] = True
+
+
+	def search(self, word):
+		t = self.trie
+		for c in word:
+			if c not in t: return False
+			t = t[c]
+		return "-" in t
+
+	def startsWith(self, prefix):
+		t = self.trie
+		for c in prefix:
+			if c not in t: return False
+			t = t[c]
+		return True
