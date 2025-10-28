@@ -1,30 +1,34 @@
-from collections import defaultdict
+Trie = dict[str, "Trie"]
 
 class WordDictionary:
+  def __init__(self):
+    self._storage: Trie = {}
+    self._end = "#"
+    self._any = "."
 
-    def __init__(self):
-        """ Initialize your data structure here. """
-        # create a defaultdict of sets to store the words
-        # keys are word lengths, values are sets of words of that length
-        self.dic = defaultdict(set)
+  def addWord(self, word: str) -> None:
+    curr = self._storage
+    for char in word:
+      if char not in curr:
+        curr[char] = {}
+      curr = curr[char]
+    curr[self._end] = {}
 
-    def addWord(self, word: str) -> None:
-        """ Adds a word into the data structure. """
-        # add the word to the set of words with the same length
-        self.dic[len(word)].add(word)
+  def search(self, word: str) -> bool:
+    return self._recursive_search(self._storage, 0, word)
 
-    def search(self, word: str) -> bool:
-        """ Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter. """
-        # if the word doesn't contain dots, check if it exists in the set of words with the same length
-        if '.' not in word:
-            return word in self.dic[len(word)]
-        # if the word contains dots, iterate over all words of the same length
-        for v in self.dic[len(word)]:
-            # check if each character in the word matches the corresponding character in the word being searched, except for the dots
-            for i, ch in enumerate(word):
-                if ch != v[i] and ch != '.':
-                    break
-            else:
-                return True
-        # if no matching word is found, return False
-        return False
+  def _recursive_search(self, node: Trie, idx: int, word: str) -> bool:
+    if idx == len(word):
+      return self._end in node
+
+    char = word[idx]
+    if char is self._any:
+      res = False
+      for entry in node:
+        res |= self._recursive_search(node[entry], idx + 1, word)
+      return res
+
+    if char not in node:
+      return False
+
+    return self._recursive_search(node[char], idx + 1, word)
