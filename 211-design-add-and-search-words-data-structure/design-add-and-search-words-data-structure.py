@@ -1,36 +1,40 @@
-class Node:
-    
+class TrieNode:
     def __init__(self):
-        
-        self.d = defaultdict(Node)
-        self.EOW = False
-        
-
+        self.children={}
+        self.endOfWord=False
 class WordDictionary:
-    
+
     def __init__(self):
-        self.words = Node()
-        
+        self.root=TrieNode()
 
     def addWord(self, word: str) -> None:
-        
-        cur = self.words
-        for ch in word: cur = cur.d[ch]
-        cur.EOW = True
-
+        cur=self.root
+        for letter in word:
+            if letter not in cur.children:
+                cur.children[letter]=TrieNode()
+            cur=cur.children[letter]
+        cur.endOfWord=True
 
     def search(self, word: str) -> bool:
-        
-        return self.dfs(word, self.words)   
+        def dfs(j,root):
+            cur=root
+            for i in range(j,len(word)):
+                letter=word[i]
+                if letter=='.':
+                    for child in cur.children.values():
+                        if dfs(i+1,child):
+                            return True
+                    return False
+                else:
+                    if letter not in cur.children:
+                        return False
+                    cur=cur.children[letter]
+            return cur.endOfWord
+        return dfs(0,self.root)
 
-    
-    def dfs(self, word: str, node: Node, i = 0) -> bool:
-        
-        if not node         : return False
-        if i == len(word)   : return node.EOW
 
-        if word[i] == '.'   : return any(
-                                (self.dfs(word, child, i+1)
-                                for child in node.d.values()))
 
-        return self.dfs(word, node.d.get(word[i]), i+1)
+# Your WordDictionary object will be instantiated and called as such:
+# obj = WordDictionary()
+# obj.addWord(word)
+# param_2 = obj.search(word)
