@@ -1,34 +1,36 @@
-class TrieNode():
-    def __init__(self):
-        self.children = collections.defaultdict(TrieNode)
-        self.isWord = False
+class Node:
     
-class WordDictionary(object):
     def __init__(self):
-        self.root = TrieNode()
+        
+        self.d = defaultdict(Node)
+        self.EOW = False
+        
 
-    def addWord(self, word):
-        node = self.root
-        for w in word:
-            node = node.children[w]
-        node.isWord = True
-
-    def search(self, word):
-        node = self.root
-        self.res = False
-        self.dfs(node, word)
-        return self.res
+class WordDictionary:
     
-    def dfs(self, node, word):
-        if not word:
-            if node.isWord:
-                self.res = True
-            return 
-        if word[0] == ".":
-            for n in node.children.values():
-                self.dfs(n, word[1:])
-        else:
-            node = node.children.get(word[0])
-            if not node:
-                return 
-            self.dfs(node, word[1:])
+    def __init__(self):
+        self.words = Node()
+        
+
+    def addWord(self, word: str) -> None:
+        
+        cur = self.words
+        for ch in word: cur = cur.d[ch]
+        cur.EOW = True
+
+
+    def search(self, word: str) -> bool:
+        
+        return self.dfs(word, self.words)   
+
+    
+    def dfs(self, word: str, node: Node, i = 0) -> bool:
+        
+        if not node         : return False
+        if i == len(word)   : return node.EOW
+
+        if word[i] == '.'   : return any(
+                                (self.dfs(word, child, i+1)
+                                for child in node.d.values()))
+
+        return self.dfs(word, node.d.get(word[i]), i+1)
