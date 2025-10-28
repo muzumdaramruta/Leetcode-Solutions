@@ -1,34 +1,35 @@
 class TrieNode:
     def __init__(self):
-        self.children = {}
-        self.is_word = False
+        self.children = [None] * 26  # Fixed size array for 'a' to 'z'
+        self.isEnd = False
 
-class Trie(object):
-
+class Trie:
     def __init__(self):
         self.root = TrieNode()
 
-    def insert(self, word):
+    def insert(self, word: str) -> None:
         node = self.root
         for char in word:
-            if char not in node.children:
-                node.children[char] = TrieNode()
-            node = node.children[char]
-        node.is_word = True
+            index = ord(char) - ord('a')
+            if not node.children[index]:
+                node.children[index] = TrieNode()
+            node = node.children[index]
+        node.isEnd = True
 
-    def search(self, word):
+    def search(self, word: str) -> bool:
         node = self.root
         for char in word:
-            if char not in node.children:
+            index = ord(char) - ord('a')
+            if not node.children[index]:
                 return False
-            node = node.children[char]
-        return node.is_word
+            node = node.children[index]
+        return node.isEnd
 
-    def startsWith(self, prefix):
+    def startsWith(self, prefix: str) -> bool:
         node = self.root
         for char in prefix:
-            if char not in node.children:
+            index = ord(char) - ord('a')
+            if not node.children[index]:
                 return False
-            node = node.children[char]
+            node = node.children[index]
         return True
-
