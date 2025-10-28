@@ -1,36 +1,31 @@
-class WordDictionary:
-
+class TrieNode:
     def __init__(self):
+        self.children = {}
+        self.is_word = False
         
-        # Initialize your data structure here.
-        self.children = [None]*26
-        self.isEndOfWord = False
+class WordDictionary:
+    def __init__(self):
+        self.root = TrieNode()      
+
+    def addWord(self, word):
+        current_node = self.root
+        for character in word:
+            current_node = current_node.children.setdefault(character, TrieNode())
+        current_node.is_word = True
         
-
-    def addWord(self, word: str) -> None:
-
-        # Adds a word into the data structure.
-        curr = self
-        for c in word:
-            if curr.children[ord(c) - ord('a')] == None:
-                curr.children[ord(c) - ord('a')] = WordDictionary()
-            curr = curr.children[ord(c) - ord('a')]
-        
-        curr.isEndOfWord = True;
-        
-
-    def search(self, word: str) -> bool:
-
-        # Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter.
-        curr = self
-        for i in range(len(word)):
-            c = word[i]
-            if c == '.':
-                for ch in curr.children:
-                    if ch != None and ch.search(word[i+1:]): return True
-                return False
+    def search(self, word):
+        def dfs(node, index):
+            if index == len(word):
+                return node.is_word
+               
+            if word[index] == ".":
+                for child in node.children.values():
+                    if dfs(child, index+1):
+                        return True
+                    
+            if word[index] in node.children:
+                return dfs(node.children[word[index]], index+1)
             
-            if curr.children[ord(c) - ord('a')] == None: return False
-            curr = curr.children[ord(c) - ord('a')]
-        
-        return curr != None and curr.isEndOfWord
+            return False
+    
+        return dfs(self.root, 0)
