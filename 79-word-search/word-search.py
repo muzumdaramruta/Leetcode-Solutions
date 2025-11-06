@@ -1,46 +1,27 @@
 class Solution:
     def exist(self, board: List[List[str]], word: str) -> bool:
-        # Count number of letters in board and store it in a dictionary
-        boardDic = defaultdict(int)
-        for i in range(len(board)):
-            for j in range(len(board[0])):
-                boardDic[board[i][j]] += 1
+        
+        m, n = len(board), len(board[0])
+        
+        if len(word) > m * n: return False                            # [a] trivial case to discard
 
-        # Count number of letters in word
-        # Check if board has all the letters in the word and they are atleast same count from word
-        wordDic = Counter(word)
-        for c in wordDic:
-            if c not in boardDic or boardDic[c] < wordDic[c]:
-                return False
+        if not (cnt := Counter(word)) <= Counter(chain(*board)):      # [b] there are not enough
+            return False                                              #     letters on the board
+        
+        if cnt[word[0]] > cnt[word[-1]]:                              # [c] inverse word if it's better
+             word = word[::-1]                                        #     to start from the end
+        
+        def dfs(i, j, s):                                             # recursive postfix search
+            
+            if s == len(word) : return True                           # [1] found the word
+            
+            if 0 <= i < m and 0 <= j < n and board[i][j] == word[s]:  # [2] found a letter
+                board[i][j] = "#"                                     # [3] mark as visited
+                adj = [(i,j+1),(i,j-1),(i+1,j),(i-1,j)]               # [4] iterate over adjacent cells...
+                dp = any(dfs(ii,jj,s+1) for ii,jj in adj)             # [5] ...and try next letter
+                board[i][j] = word[s]                                 # [6] remove mark
+                return dp                                             # [7] return search result
 
-        # Traverse through board and if word[0] == board[i][j], call the DFS function
-        for i in range(len(board)):
-            for j in range(len(board[0])):
-                if board[i][j] == word[0]:
-                    if self.dfs(i, j, 0, board, word):
-                        return True
-
-        return False
-
-    def dfs(self, i, j, k, board, word):
-        # Recursion will return False if (i,j) is out of bounds or board[i][j] != word[k] which is current letter we need
-        if i < 0 or j < 0 or i >= len(board) or j >= len(board[0]) or \
-        k >= len(word) or word[k] != board[i][j]:
-            return False
-
-        # If this statement is true then it means we have reach the last letter in the word so we can return True
-        if k == len(word) - 1:
-            return True
-
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-
-        for x, y in directions:
-            # Since we can't use the same letter twice, I'm changing current board[i][j] to -1 before traversing further
-            tmp = board[i][j]
-            board[i][j] = -1
-
-            # If dfs returns True then return True so there will be no further dfs
-            if self.dfs(i + x, j + y, k + 1, board, word): 
-                return True
-
-            board[i][j] = tmp
+            return False                                              # [8] this DFS branch failed
+                
+        return any(dfs(i,j,0) for i,j in product(range(m),range(n)))  # search starting from each position
