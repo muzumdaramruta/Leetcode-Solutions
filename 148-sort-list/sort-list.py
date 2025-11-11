@@ -1,40 +1,18 @@
-class ListNode:
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
-
-class Solution:
-    def sortList(self, head: ListNode) -> ListNode:
-        if not head or not head.next:
-            return head
-
-        mid = self.getMid(head)
-        left = self.sortList(head)
-        right = self.sortList(mid)
-
-        return self.merge(left, right)
-
-    def getMid(self, head: ListNode) -> ListNode:
-        slow, fast = head, head
-        prev = None
-        while fast and fast.next:
-            prev = slow
-            slow = slow.next
-            fast = fast.next.next
-        prev.next = None
-        return slow
-
-    def merge(self, left: ListNode, right: ListNode) -> ListNode:
-        dummy = ListNode(0)
-        tail = dummy
-        while left and right:
-            if left.val < right.val:
-                tail.next = left
-                left = left.next
-            else:
-                tail.next = right
-                right = right.next
-            tail = tail.next
-
-        tail.next = left if left else right
-        return dummy.next
+class Solution(object):
+    def sortList(self, head):
+        if head is None:
+            return None
+        ptr=head
+        arr=[]
+        while ptr is not None:
+            arr.append(ptr.val)
+            ptr=ptr.next
+        arr.sort()
+        n = ListNode(arr[0])
+        head=n
+        temp=head
+        for i in range(1,len(arr)):
+            n1 = ListNode(arr[i])
+            temp.next=n1
+            temp=temp.next       
+        return head
