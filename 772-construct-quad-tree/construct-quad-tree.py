@@ -11,14 +11,18 @@ class Node:
 """
 
 class Solution:
-    def construct(self, grid: List[List[int]]) -> 'Node':
-        # check if it is a leaf node
-        if all(cell == grid[0][0] for row in grid for cell in row):
-            return Node(bool(grid[0][0]), True)
-        
-        # if not, return a node with all smaller grids
-        n = len(grid) // 2
-        return Node(True, False, self.construct([row[:n] for row in grid[:n]]),
-                                 self.construct([row[n:] for row in grid[:n]]),
-                                 self.construct([row[:n] for row in grid[n:]]),
-                                 self.construct([row[n:] for row in grid[n:]]))
+    def construct(self, grid: list[list[int]]) -> 'Node':
+        n = len(grid)
+        def build(r, c, l):
+            v = grid[r][c]
+            for i in range(r, r+l):
+                for j in range(c, c+l):
+                    if grid[i][j] != v:
+                        h = l//2
+                        tl = build(r, c, h)
+                        tr = build(r, c+h, h)
+                        bl = build(r+h, c, h)
+                        br = build(r+h, c+h, h)
+                        return Node(True, False, tl, tr, bl, br)
+            return Node(bool(v), True, None, None, None, None)
+        return build(0, 0, n)
