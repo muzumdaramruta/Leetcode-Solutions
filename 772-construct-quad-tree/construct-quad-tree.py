@@ -11,18 +11,20 @@ class Node:
 """
 
 class Solution:
-    def construct(self, grid: list[list[int]]) -> 'Node':
-        n = len(grid)
-        def build(r, c, l):
-            v = grid[r][c]
-            for i in range(r, r+l):
-                for j in range(c, c+l):
-                    if grid[i][j] != v:
-                        h = l//2
-                        tl = build(r, c, h)
-                        tr = build(r, c+h, h)
-                        bl = build(r+h, c, h)
-                        br = build(r+h, c+h, h)
-                        return Node(True, False, tl, tr, bl, br)
-            return Node(bool(v), True, None, None, None, None)
-        return build(0, 0, n)
+    def construct(self, grid: List[List[int]]) -> 'Node':
+        def dfs(r,c,n):
+            all_same = True
+            for i in range(n):
+                for j in range(n):
+                    if grid[r][c] !=  grid[r+i][c+j]:
+                        all_same = False
+                        break 
+            if all_same:
+                return Node(grid[r][c],True)
+            n//=2
+            topleft = dfs(r,c,n)
+            topright = dfs(r,c+n,n)
+            bottomleft= dfs(r+n,c,n)
+            bottomright = dfs(r+n,c+n,n)
+            return Node(grid[r][c],False,topleft,topright,bottomleft,bottomright)    
+        return dfs(0,0,len(grid))
