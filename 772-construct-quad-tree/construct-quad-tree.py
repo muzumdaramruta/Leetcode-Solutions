@@ -11,20 +11,21 @@ class Node:
 """
 
 class Solution:
-  def construct(self, grid: list[list[int]]) -> 'Node':
-    return self._helper(grid, 0, 0, len(grid))
+    def construct(self, grid):
 
-  def _helper(self, grid: list[list[int]], i: int, j: int, w: int) -> 'Node':
-    if self._allSame(grid, i, j, w):
-      return Node(grid[i][j] == 1, True)
-    half = w // 2
-    return Node(True, False,
-                self._helper(grid, i, j, half),
-                self._helper(grid, i, j + half, half),
-                self._helper(grid, i + half, j, half),
-                self._helper(grid, i + half, j + half, half))
+        def helper(grid, row, col, length):
+            if length == 1:
+                return Node(grid[row][col] == 1, True, None, None, None, None)
 
-  def _allSame(self, grid: list[list[int]], i: int, j: int, w: int) -> bool:
-    return all(grid[x][y] == grid[i][j]
-               for x in range(i, i + w)
-               for y in range(j, j + w))
+            topLeft = helper(grid, row, col, length // 2)
+            topRight = helper(grid, row, col + length // 2, length // 2)
+            bottomLeft = helper(grid, row + length // 2, col, length // 2)
+            bottomRight = helper(grid, row + length // 2, col + length // 2, length // 2)
+
+            if topLeft.isLeaf == topRight.isLeaf == bottomLeft.isLeaf == bottomRight.isLeaf == True:
+                if topLeft.val == topRight.val == bottomLeft.val == bottomRight.val:
+                    return Node(topLeft.val, True, None, None, None, None)
+
+            return Node("*", False, topLeft, topRight, bottomLeft, bottomRight)
+
+        return helper(grid, 0, 0, len(grid))
