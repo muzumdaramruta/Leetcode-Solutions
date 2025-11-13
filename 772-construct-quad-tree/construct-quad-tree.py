@@ -12,19 +12,37 @@ class Node:
 
 class Solution:
     def construct(self, grid: List[List[int]]) -> 'Node':
-        def dfs(r,c,n):
-            all_same = True
-            for i in range(n):
-                for j in range(n):
-                    if grid[r][c] !=  grid[r+i][c+j]:
-                        all_same = False
-                        break 
-            if all_same:
-                return Node(grid[r][c],True)
-            n//=2
-            topleft = dfs(r,c,n)
-            topright = dfs(r,c+n,n)
-            bottomleft= dfs(r+n,c,n)
-            bottomright = dfs(r+n,c+n,n)
-            return Node(grid[r][c],False,topleft,topright,bottomleft,bottomright)    
-        return dfs(0,0,len(grid))
+        """
+        :type grid: List[List[int]]
+        :rtype: Node
+        """
+        def buildQuadTree(size, grid, startRow, startCol):
+            if size == 1:
+                return Node(bool(grid[startRow][startCol]), True)
+
+            countZero = 0
+            countOne = 0
+            for row in range(startRow, startRow + size):
+                for col in range(startCol, startCol + size):
+                    if grid[row][col] == 1:
+                        countOne += 1
+                    else:
+                        countZero += 1
+
+            if countOne == size * size:
+                return Node(True, True)
+            elif countZero == size * size:
+                return Node(False, True)
+            else:
+                halfSize = size // 2
+                topLeftNode = buildQuadTree(halfSize, grid, startRow, startCol)
+                topRightNode = buildQuadTree(halfSize, grid, startRow, startCol + halfSize)
+                bottomLeftNode = buildQuadTree(halfSize, grid, startRow + halfSize, startCol)
+                bottomRightNode = buildQuadTree(halfSize, grid, startRow + halfSize, startCol + halfSize)
+                return Node(True, False, topLeftNode, topRightNode, bottomLeftNode, bottomRightNode)
+
+        n = len(grid)
+        if n == 0:
+            return None
+
+        return buildQuadTree(n, grid, 0, 0)
