@@ -1,31 +1,17 @@
-"""
-# Definition for a QuadTree node.
-class Node:
-    def __init__(self, val, isLeaf, topLeft, topRight, bottomLeft, bottomRight):
-        self.val = val
-        self.isLeaf = isLeaf
-        self.topLeft = topLeft
-        self.topRight = topRight
-        self.bottomLeft = bottomLeft
-        self.bottomRight = bottomRight
-"""
-
-class Solution:
+class Solution(object):
     def construct(self, grid):
-
-        def helper(grid, row, col, length):
-            if length == 1:
-                return Node(grid[row][col] == 1, True, None, None, None, None)
-
-            topLeft = helper(grid, row, col, length // 2)
-            topRight = helper(grid, row, col + length // 2, length // 2)
-            bottomLeft = helper(grid, row + length // 2, col, length // 2)
-            bottomRight = helper(grid, row + length // 2, col + length // 2, length // 2)
-
-            if topLeft.isLeaf == topRight.isLeaf == bottomLeft.isLeaf == bottomRight.isLeaf == True:
-                if topLeft.val == topRight.val == bottomLeft.val == bottomRight.val:
-                    return Node(topLeft.val, True, None, None, None, None)
-
-            return Node("*", False, topLeft, topRight, bottomLeft, bottomRight)
-
-        return helper(grid, 0, 0, len(grid))
+        def create(x, y, n):
+            node = Node()
+            t = grid[x][y]
+            for i in range(x, x+n):
+                for j in range(y, y+n):
+                    if grid[i][j] != t:
+                       node.topLeft = create(x, y, n//2)
+                       node.topRight = create(x, y+ n//2, n//2 )
+                       node.bottomLeft = create(x+ n//2, y, n//2)
+                       node.bottomRight = create(x+ n//2, y+ n//2, n//2)
+                       return node
+            node.isLeaf = True
+            node.val = t
+            return node
+        return create(0, 0, len(grid))
