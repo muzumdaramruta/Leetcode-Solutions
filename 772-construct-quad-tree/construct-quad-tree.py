@@ -11,38 +11,20 @@ class Node:
 """
 
 class Solution:
-    def construct(self, grid: List[List[int]]) -> 'Node':
-        """
-        :type grid: List[List[int]]
-        :rtype: Node
-        """
-        def buildQuadTree(size, grid, startRow, startCol):
-            if size == 1:
-                return Node(bool(grid[startRow][startCol]), True)
+  def construct(self, grid: list[list[int]]) -> 'Node':
+    return self._helper(grid, 0, 0, len(grid))
 
-            countZero = 0
-            countOne = 0
-            for row in range(startRow, startRow + size):
-                for col in range(startCol, startCol + size):
-                    if grid[row][col] == 1:
-                        countOne += 1
-                    else:
-                        countZero += 1
+  def _helper(self, grid: list[list[int]], i: int, j: int, w: int) -> 'Node':
+    if self._allSame(grid, i, j, w):
+      return Node(grid[i][j] == 1, True)
+    half = w // 2
+    return Node(True, False,
+                self._helper(grid, i, j, half),
+                self._helper(grid, i, j + half, half),
+                self._helper(grid, i + half, j, half),
+                self._helper(grid, i + half, j + half, half))
 
-            if countOne == size * size:
-                return Node(True, True)
-            elif countZero == size * size:
-                return Node(False, True)
-            else:
-                halfSize = size // 2
-                topLeftNode = buildQuadTree(halfSize, grid, startRow, startCol)
-                topRightNode = buildQuadTree(halfSize, grid, startRow, startCol + halfSize)
-                bottomLeftNode = buildQuadTree(halfSize, grid, startRow + halfSize, startCol)
-                bottomRightNode = buildQuadTree(halfSize, grid, startRow + halfSize, startCol + halfSize)
-                return Node(True, False, topLeftNode, topRightNode, bottomLeftNode, bottomRightNode)
-
-        n = len(grid)
-        if n == 0:
-            return None
-
-        return buildQuadTree(n, grid, 0, 0)
+  def _allSame(self, grid: list[list[int]], i: int, j: int, w: int) -> bool:
+    return all(grid[x][y] == grid[i][j]
+               for x in range(i, i + w)
+               for y in range(j, j + w))
